@@ -1,26 +1,7 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-'use strict';
-
-const babelRegister = require('@babel/register');
-babelRegister({
-  ignore: [/[\\\/](build|server\/server|node_modules)[\\\/]/],
-  presets: [['react-app', {runtime: 'automatic'}]],
-  plugins: ['@babel/transform-modules-commonjs'],
-});
-
-const express = require('express');
-const compress = require('compression');
-const {readFileSync} = require('fs');
-const path = require('path');
-const render = require('./render');
-const {JS_BUNDLE_DELAY} = require('./delays');
+import express from 'express';
+import compress from 'compression';
+import render from './render';
+import {JS_BUNDLE_DELAY} from './delays';
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -38,8 +19,7 @@ app.use((req, res, next) => {
 app.use(compress());
 app.get(
   '/',
-  handleErrors(async function(req, res) {
-    await waitForWebpack();
+  handleErrors(function(req, res) {
     render(req.url, res);
   })
 );
@@ -78,18 +58,4 @@ function handleErrors(fn) {
       next(x);
     }
   };
-}
-
-async function waitForWebpack() {
-  while (true) {
-    try {
-      readFileSync(path.resolve(__dirname, '../build/main.js'));
-      return;
-    } catch (err) {
-      console.log(
-        'Could not find webpack build output. Will retry in a second...'
-      );
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-  }
 }

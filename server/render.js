@@ -6,20 +6,13 @@
  *
  */
 
-import * as React from "react";
-// import {renderToString} from 'react-dom/server';
 import { renderToPipeableStream } from "react-dom/server";
-import App from "../src/App";
-import { DataProvider } from "../src/data";
+import App from "../client/App";
+import { DataProvider } from "../client/data";
 import { API_DELAY, ABORT_DELAY } from "./delays";
+import assets from "./assets-manifest.json";
 
-// In a real setup, you'd read it from webpack build stats.
-let assets = {
-  "main.js": "/main.js",
-  "main.css": "/main.css"
-};
-
-module.exports = function render(url, res) {
+export default function render(url, res) {
   // This is how you would wire it up previously:
   //
   // res.send(
